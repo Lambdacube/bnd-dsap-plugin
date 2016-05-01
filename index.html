@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>bnd-dsap-plugin by Lambdacube</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">bnd-dsap-plugin</h1>
+      <h2 class="project-tagline">Bnd Declarative Services Annotation Properties Plugin</h2>
+      <a href="https://github.com/Lambdacube/bnd-dsap-plugin" class="btn">View on GitHub</a>
+      <a href="https://github.com/Lambdacube/bnd-dsap-plugin/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/Lambdacube/bnd-dsap-plugin/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="bnd-declarative-services-annotation-properties-plugin" class="anchor" href="#bnd-declarative-services-annotation-properties-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Bnd Declarative Services Annotation Properties Plugin</h1>
+
+<p>This plugin allows the definition of DS component properties using annotations</p>
+
+<p>Instead of a clumsy and error-prone property definition such as this:</p>
+
+<div class="highlight highlight-source-java"><pre>@Component(property <span class="pl-k">=</span> { <span class="pl-s"><span class="pl-pds">"</span>custom.secure:Boolean=true<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>custom.public:Boolean=true<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>custom.continent=AFRICA<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>custom.continent=EUROPE<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>service.ranking:Integer=10<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>custom.alias=yeepee<span class="pl-pds">"</span></span> })
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-en">MyNotSoCoolComponent</span> <span class="pl-k">implements</span> <span class="pl-e">MyService</span> {
+    <span class="pl-c">// methods</span>
+}</pre></div>
+
+<p>this plugin will enrich the XML component descriptor at compile time so you can use annotations instead:</p>
+
+<div class="highlight highlight-source-java"><pre>@Secure(<span class="pl-c1">true</span>)
+@<span class="pl-smi">Public</span>
+@ContinentSpecific({<span class="pl-smi">Continent</span><span class="pl-c1"><span class="pl-k">.</span>AFRICA</span>, <span class="pl-smi">Continent</span><span class="pl-c1"><span class="pl-k">.</span>EUROPE</span>})
+@<span class="pl-smi">Component</span>
+@ServiceRanking(<span class="pl-c1">10</span>)
+@Alias(<span class="pl-s"><span class="pl-pds">"</span>yeepee<span class="pl-pds">"</span></span>)
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-en">MyCoolComponent</span> <span class="pl-k">implements</span> <span class="pl-e">MyService</span> {
+
+}</pre></div>
+
+<p>It's only a matter of defining the annotations you like and annotating them with <code>@ComponentProperty(&lt;propertyName&gt;)</code></p>
+
+<div class="highlight highlight-source-java"><pre>@ComponentProperty(<span class="pl-s"><span class="pl-pds">"</span>custom.alias<span class="pl-pds">"</span></span>)
+@Target(<span class="pl-smi">ElementType</span><span class="pl-c1"><span class="pl-k">.</span>TYPE</span>)
+<span class="pl-k">public</span> <span class="pl-k">@interface</span> <span class="pl-en">Alias</span> {
+    <span class="pl-smi">String</span> <span class="pl-en">value</span>();
+}</pre></div>
+
+<p>This generates the following XML descriptor:</p>
+
+<div class="highlight highlight-text-xml"><pre>&lt;?<span class="pl-ent">xml</span><span class="pl-e"> version</span>=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span><span class="pl-e"> encoding</span>=<span class="pl-s"><span class="pl-pds">"</span>UTF-8<span class="pl-pds">"</span></span>?&gt;
+&lt;<span class="pl-ent">component</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>io.lambdacube.component.demo.basic.MyCoolComponent<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">implementation</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>io.lambdacube.component.demo.basic.MyCoolComponent<span class="pl-pds">"</span></span>/&gt;
+  &lt;<span class="pl-ent">service</span>&gt;
+    &lt;<span class="pl-ent">provide</span> <span class="pl-e">interface</span>=<span class="pl-s"><span class="pl-pds">"</span>io.lambdacube.component.demo.basic.MyService<span class="pl-pds">"</span></span>/&gt;
+  &lt;/<span class="pl-ent">service</span>&gt;
+  &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>custom.secure<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>Boolean<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>true<span class="pl-pds">"</span></span>/&gt;
+  &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>custom.public<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>Boolean<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>true<span class="pl-pds">"</span></span>/&gt;
+  &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>custom.continent<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>String<span class="pl-pds">"</span></span>&gt;AFRICA
+EUROPE&lt;/<span class="pl-ent">property</span>&gt;
+  &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>service.ranking<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>Integer<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>10<span class="pl-pds">"</span></span>/&gt;
+&lt;/<span class="pl-ent">component</span>&gt;
+</pre></div>
+
+<h1>
+<a id="componentpropertygroup" class="anchor" href="#componentpropertygroup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>@ComponentPropertyGroup</code>
+</h1>
+
+<p>It is also possible to define an annotation that will potentially publish several properties using the annotation <code>@ComponentPropertyGroup</code>.</p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">ComponentPropertyGroup</span>
+@Target(<span class="pl-smi">ElementType</span><span class="pl-c1"><span class="pl-k">.</span>TYPE</span>)
+<span class="pl-k">public</span> <span class="pl-k">@interface</span> <span class="pl-en">GogoCommand</span> {
+
+    <span class="pl-k">@ComponentProperty</span>(<span class="pl-s"><span class="pl-pds">"</span>osgi.command.scope<span class="pl-pds">"</span></span>)
+    <span class="pl-smi">String</span> <span class="pl-en">scope</span>();
+
+    <span class="pl-k">@ComponentProperty</span>(<span class="pl-s"><span class="pl-pds">"</span>osgi.command.function<span class="pl-pds">"</span></span>)
+    String[]<span class="pl-en">commandFunction</span>();
+}</pre></div>
+
+<p>In this case, both properties are added.</p>
+
+<h1>
+<a id="caveats" class="anchor" href="#caveats" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Caveats</h1>
+
+<p>I am using Maven and maven-bundle-plugin because I am comfortable with it. Because there still isn't a release using bndlib 3.1.0, it is using 3.0.0. It's only a matter of changing the property <code>${bnd.version}</code> in the root POM to change bndlib's version, but the build will have to be adapted further until m-b-p's 3.1.0 release. </p>
+
+<p>Also, Bnd does not support extending DS component descriptors properly. This is only a dirty hack, and it's not pretty. It doesn't matter because this is build-time code and it works fine, but it would be much cleaner if Bnd had first-class support for extensions in its DS component generator mechanism.</p>
+
+<p>Finally, defining the same property multiple times either through annotations or using the official <code>@Component(property={...})</code> syntax will result in the property being present several time in the XML and is likely to cause runtime problems :-).</p>
+
+<p>tl;dr: it works fine, and hopefully some day it can be rewritten in a cleaner way.  </p>
+
+<h1>
+<a id="enabling-the-plugin" class="anchor" href="#enabling-the-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Enabling the plugin</h1>
+
+<p>With Bnd:
+(The plugin has to be on the classpath).</p>
+
+<pre><code>-plugin: io.lambdacube.bnd.component.annotation.properties.DSAPPlugin
+</code></pre>
+
+<p>With maven-bundle-plugin:</p>
+
+<div class="highlight highlight-text-xml"><pre>  &lt;<span class="pl-ent">plugin</span>&gt;
+        &lt;<span class="pl-ent">groupId</span>&gt;org.apache.felix&lt;/<span class="pl-ent">groupId</span>&gt;
+        &lt;<span class="pl-ent">artifactId</span>&gt;maven-bundle-plugin&lt;/<span class="pl-ent">artifactId</span>&gt;
+        &lt;<span class="pl-ent">extensions</span>&gt;true&lt;/<span class="pl-ent">extensions</span>&gt;
+        &lt;<span class="pl-ent">version</span>&gt;3.0.0&lt;/<span class="pl-ent">version</span>&gt;
+        &lt;<span class="pl-ent">configuration</span>&gt;
+          &lt;<span class="pl-ent">instructions</span>&gt;
+            &lt;<span class="pl-ent">_plugin</span>&gt;
+              io.lambdacube.bnd.component.annotation.properties.DSAPPlugin
+            &lt;/<span class="pl-ent">_plugin</span>&gt;
+          &lt;/<span class="pl-ent">instructions</span>&gt;
+        &lt;/<span class="pl-ent">configuration</span>&gt;
+        &lt;<span class="pl-ent">dependencies</span>&gt;
+          &lt;<span class="pl-ent">dependency</span>&gt;
+            &lt;<span class="pl-ent">groupId</span>&gt;io.lambdacube.bnd&lt;/<span class="pl-ent">groupId</span>&gt;
+            &lt;<span class="pl-ent">artifactId</span>&gt;bnd-dsap-plugin&lt;/<span class="pl-ent">artifactId</span>&gt;
+            &lt;<span class="pl-ent">version</span>&gt;1.0-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
+          &lt;/<span class="pl-ent">dependency</span>&gt;
+        &lt;/<span class="pl-ent">dependencies</span>&gt;
+      &lt;/<span class="pl-ent">plugin</span>&gt;</pre></div>
+
+<h1>
+<a id="usage-for-componentproperty-on-the-annotation-type" class="anchor" href="#usage-for-componentproperty-on-the-annotation-type" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage for <code>@ComponentProperty</code> on the annotation type</h1>
+
+<ul>
+<li>
+<code>@ComponentProperty</code> annotations must either:
+
+<ul>
+<li>be empty, in that case they are <code>Boolean</code> and the value is <code>Boolean.TRUE</code>.</li>
+<li>have exactly one method, named <code>value</code>
+
+<ul>
+<li>default values are not supported (and not really useful), except for empty arrays (in that case, the property is ignored)</li>
+<li>if the return type is either <code>int</code>, <code>float</code>, <code>double</code>, <code>boolean</code>, the corresponding boxed type is used.</li>
+<li>otherwise, for Strings, Enums, Classes (or Annotations themselves, discouraged), the type is String and the value is the result of a call to <code>Object::toString</code> on the annotation value.<br>
+</li>
+<li>arrays are supported, and behave as you'd expect.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>You are free to use a <code>RUNTIME</code> retention if you want to also introspect the annotations at runtime, but a <code>SOURCE</code> retention will not work (as Bnd works on classes).</li>
+</ul>
+
+<h1>
+<a id="usage-for-componentpropertygroup-on-the-annotation-type" class="anchor" href="#usage-for-componentpropertygroup-on-the-annotation-type" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage for <code>@ComponentPropertyGroup</code> on the annotation type</h1>
+
+<p>Then you put <code>@ComponentProperty</code> on your annotation methods. The annotation must not be empty, and at least one method has to be annotated with <code>ComponentProperty</code>. Rules for methods are the same as above.</p>
+
+<h1>
+<a id="advanced-usage" class="anchor" href="#advanced-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Advanced Usage</h1>
+
+<p>It is also possible to make annotations "provide" OSGi services. </p>
+
+<p>Take the following component:</p>
+
+<div class="highlight highlight-source-java"><pre>@Component(service <span class="pl-k">=</span> <span class="pl-smi">Object</span><span class="pl-k">.</span>class)
+@GogoCommand(scope <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>greeting<span class="pl-pds">"</span></span>, commandFunction <span class="pl-k">=</span> { <span class="pl-s"><span class="pl-pds">"</span>sayHello<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>sayGoodbye<span class="pl-pds">"</span></span>})
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-en">MyComponentWithShellCommands</span> {
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">sayHello</span>() {
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">sayGoodbye</span>() {
+    }
+}
+</pre></div>
+
+<p>In the <code>@Component</code> annotation, we have to specify <code>(service = Object.class)</code> because of the expectations of the consuming framework (e.g Gogo shell), which is filtering on service properties but doesn't care about the service interface itself (<code>objectClass</code> property) because it uses reflection.</p>
+
+<p>Because of Declarative Services' rules, if a component does not provide a service either through implementing interfaces or explicitly providing them using the <code>(service = ...)</code> definition, then no service is published to the registry. I am not sure how much sense it makes to have component properties on such a service, but that is how things are currently :-). </p>
+
+<p>If our component was providing any other service, it would not need to provide <code>Object.class</code> as well. This is just a trick to make sure it is registered as a service.</p>
+
+<p>This plugin makes it possible, in these cases, to fallback to a <code>Object.class</code> without having to specify it. </p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">EnsureProvideService</span>
+@<span class="pl-smi">ComponentPropertyGroup</span>
+@Target(<span class="pl-smi">ElementType</span><span class="pl-c1"><span class="pl-k">.</span>TYPE</span>)
+<span class="pl-k">public</span> <span class="pl-k">@interface</span> <span class="pl-en">GogoCommand</span> {
+
+    <span class="pl-k">@ComponentProperty</span>(<span class="pl-s"><span class="pl-pds">"</span>osgi.command.scope<span class="pl-pds">"</span></span>)
+    <span class="pl-smi">String</span> <span class="pl-en">scope</span>();
+
+    <span class="pl-k">@ComponentProperty</span>(<span class="pl-s"><span class="pl-pds">"</span>osgi.command.function<span class="pl-pds">"</span></span>)
+    String[]<span class="pl-en">commandFunction</span>();
+}</pre></div>
+
+<p>This feature is entirely optional, and it changes the semantic of DS slightly (for the better). Don't use <code>@EnsureProvideService</code> on your property annotations if you don't like it.</p>
+
+<h1>
+<a id="updated-gogo-example" class="anchor" href="#updated-gogo-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Updated Gogo example</h1>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Component</span>
+@GogoCommand(scope <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>greeting<span class="pl-pds">"</span></span>, commandFunction <span class="pl-k">=</span> { <span class="pl-s"><span class="pl-pds">"</span>sayHello<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>sayGoodbye<span class="pl-pds">"</span></span>})
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-en">MyComponentWithShellCommands</span> {
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">sayHello</span>() {
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">sayGoodbye</span>() {
+    }
+
+}</pre></div>
+
+<p>The following XML gets generated:</p>
+
+<div class="highlight highlight-text-xml"><pre>&lt;?<span class="pl-ent">xml</span><span class="pl-e"> version</span>=<span class="pl-s"><span class="pl-pds">"</span>1.0<span class="pl-pds">"</span></span><span class="pl-e"> encoding</span>=<span class="pl-s"><span class="pl-pds">"</span>UTF-8<span class="pl-pds">"</span></span>?&gt;
+&lt;<span class="pl-ent">component</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>io.lambdacube.component.demo.gogo.MyComponentWithShellCommands<span class="pl-pds">"</span></span>&gt;
+  &lt;<span class="pl-ent">implementation</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>io.lambdacube.component.demo.gogo.MyComponentWithShellCommands<span class="pl-pds">"</span></span>/&gt;
+  &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>osgi.command.scope<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>String<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>greeting<span class="pl-pds">"</span></span>/&gt;
+  &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>osgi.command.function<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>String<span class="pl-pds">"</span></span>&gt;sayHello
+sayGoodbye&lt;/<span class="pl-ent">property</span>&gt;
+  &lt;<span class="pl-ent">service</span>&gt;
+    &lt;<span class="pl-ent">provide</span> <span class="pl-e">interface</span>=<span class="pl-s"><span class="pl-pds">"</span>java.lang.Object<span class="pl-pds">"</span></span>/&gt;
+  &lt;/<span class="pl-ent">service</span>&gt;
+&lt;/<span class="pl-ent">component</span>&gt;</pre></div>
+
+<p>You can find the code in the <code>examples</code> sub-module.</p>
+
+<h1>
+<a id="whats-next" class="anchor" href="#whats-next" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's next</h1>
+
+<p>I am interested in using annotations on <a href="https://github.com/Reference" class="user-mention">@Reference</a> methods.</p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Component</span>
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-en">IAmGogo</span> {
+
+    <span class="pl-k">@Reference</span>(<span class="pl-c1">cardinality</span> <span class="pl-k">=</span> <span class="pl-smi">ReferenceCardinality</span><span class="pl-c1"><span class="pl-k">.</span>MULTIPLE</span>, <span class="pl-c1">policy</span> <span class="pl-k">=</span> <span class="pl-smi">ReferencePolicy</span><span class="pl-c1"><span class="pl-k">.</span>DYNAMIC</span>)
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">addCommand</span>(<span class="pl-k">@CommandScope</span>(<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>) <span class="pl-smi">Object</span> <span class="pl-v">command</span>) {
+
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">removeCommand</span>(<span class="pl-k">@CommandScope</span>(<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>) <span class="pl-smi">Object</span> <span class="pl-v">command</span>) {
+
+    }
+}</pre></div>
+
+<p>that would be equivalent to:</p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Component</span>
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-en">IAmGogo</span> {
+
+    <span class="pl-k">@Reference</span>(<span class="pl-c1">target</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>(osgi.command.scope=*)<span class="pl-pds">"</span></span>, <span class="pl-c1">cardinality</span> <span class="pl-k">=</span> <span class="pl-smi">ReferenceCardinality</span><span class="pl-c1"><span class="pl-k">.</span>MULTIPLE</span>, <span class="pl-c1">policy</span> <span class="pl-k">=</span> <span class="pl-smi">ReferencePolicy</span><span class="pl-c1"><span class="pl-k">.</span>DYNAMIC</span>)
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">addCommand</span>(<span class="pl-smi">Object</span> <span class="pl-v">command</span>) {
+
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">removeCommand</span>(<span class="pl-smi">Object</span> <span class="pl-v">command</span>) {
+
+    }
+}
+
+</pre></div>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h1>
+
+<p>Apache Software License, version 2.0</p>
+
+<p>(c) Simon Chemouil, Lambdacube</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/Lambdacube/bnd-dsap-plugin">bnd-dsap-plugin</a> is maintained by <a href="https://github.com/Lambdacube">Lambdacube</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
