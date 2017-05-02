@@ -1,6 +1,8 @@
 # Bnd Declarative Services Annotation Properties Plugin
 This plugin allows the definition of DS component properties using annotations
 
+## The plugin as moved to [primeval-io/bnd-dsap-plugin](http://github.com/primeval-io/bnd-dsap-plugin) !
+
 # Now available on Maven Central!
 
 
